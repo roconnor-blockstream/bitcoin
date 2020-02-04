@@ -8,6 +8,9 @@
 
 #include <script/script_error.h>
 #include <primitives/transaction.h>
+extern "C" {
+#include <simplicity/bitcoin.h>
+}
 
 #include <vector>
 #include <stdint.h>
@@ -116,12 +119,17 @@ enum
     // Making OP_CODESEPARATOR and FindAndDelete fail any non-segwit scripts
     //
     SCRIPT_VERIFY_CONST_SCRIPTCODE = (1U << 16),
+
+    // Support simplicity
+    //
+    SCRIPT_VERIFY_SIMPLICITY = (1U << 17),
 };
 
 bool CheckSignatureEncoding(const std::vector<unsigned char> &vchSig, unsigned int flags, ScriptError* serror);
 
 struct PrecomputedTransactionData
 {
+    transaction* simplicityTxData = 0;
     uint256 hashPrevouts, hashSequence, hashOutputs;
     bool ready = false;
     std::vector<CTxOut> m_spent_outputs;
@@ -133,6 +141,9 @@ struct PrecomputedTransactionData
 
     template <class T>
     explicit PrecomputedTransactionData(const T& tx);
+    ~PrecomputedTransactionData() {
+      free(simplicityTxData);
+    }
 };
 
 enum class SigVersion
@@ -166,6 +177,12 @@ public:
          return false;
     }
 
+    virtual bool CheckSimplicity(const CScriptWitness& witness, const std::vector<unsigned char>& program, ScriptError* serror) const
+    {
+         return false;
+    }
+
+
     virtual ~BaseSignatureChecker() {}
 };
 
@@ -187,6 +204,7 @@ public:
     bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const override;
     bool CheckLockTime(const CScriptNum& nLockTime) const override;
     bool CheckSequence(const CScriptNum& nSequence) const override;
+    bool CheckSimplicity(const CScriptWitness& witness, const std::vector<unsigned char>& program, ScriptError* serror) const override;
 };
 
 using TransactionSignatureChecker = GenericTransactionSignatureChecker<CTransaction>;
