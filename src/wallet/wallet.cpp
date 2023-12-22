@@ -3749,9 +3749,9 @@ util::Result<ScriptPubKeyMan*> CWallet::AddWalletDescriptor(WalletDescriptor& de
         return nullptr;
     }
 
-    // Apply the label if necessary
+    // Apply the label if necessary, for descriptors that produce output scripts (i.e. not unused())
     // Note: we disable labels for ranged descriptors
-    if (!desc.descriptor->IsRange()) {
+    if (!desc.descriptor->IsRange() && desc.descriptor->HasScripts()) {
         auto script_pub_keys = spk_man->GetScriptPubKeys();
         if (script_pub_keys.empty()) {
             WalletLogPrintf("Could not generate scriptPubKeys (cache is empty)\n");
