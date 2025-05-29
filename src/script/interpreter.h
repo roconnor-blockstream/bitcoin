@@ -160,8 +160,18 @@ static constexpr script_verify_flags::value_type MAX_SCRIPT_VERIFY_FLAGS = ((scr
 
 bool CheckSignatureEncoding(const std::vector<unsigned char> &vchSig, script_verify_flags flags, ScriptError* serror);
 
+// Forward declarations of Simplicity structures.
+struct bitcoinTransaction;
+
+struct SimplicityTransactionDeleter
+{
+    void operator()(bitcoinTransaction* ptr) const;
+};
+using SimplicityTransactionUniquePtr = std::unique_ptr<bitcoinTransaction, SimplicityTransactionDeleter>;
+
 struct PrecomputedTransactionData
 {
+    SimplicityTransactionUniquePtr m_simplicity_tx_data;
     // BIP341 precomputed data.
     // These are single-SHA256, see https://github.com/bitcoin/bips/blob/master/bip-0341.mediawiki#cite_note-16.
     uint256 m_prevouts_single_hash;
