@@ -90,6 +90,7 @@ target_link_libraries(bitcoinkernel
   PRIVATE
     core_interface
     secp256k1_objs
+    BitcoinSimplicity
     $<$<PLATFORM_ID:Windows>:bcrypt>
     $<TARGET_NAME_IF_EXISTS:USDT::headers>
   PUBLIC

@@ -19,6 +19,7 @@ include(../cmake/crc32c.cmake)
 include(../cmake/leveldb.cmake)
 include(../cmake/minisketch.cmake)
 add_subdirectory(univalue)
+add_subdirectory(simplicity)
 if (ENABLE_IPC AND NOT WITH_EXTERNAL_LIBMULTIPROCESS)
   include(../cmake/libmultiprocess.cmake)
   add_libmultiprocess(ipc/libmultiprocess)
@@ -76,6 +77,7 @@ target_link_libraries(bitcoin_consensus
     core_interface
     bitcoin_crypto
     secp256k1
+    BitcoinSimplicity
 )
 
 if(WITH_ZMQ)
